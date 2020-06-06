@@ -1,0 +1,24 @@
+{
+  "name": "grades-control-api",
+  "version": "1.0.0",
+  "description": "Desenvolver uma API chamada “grades-control-api” para controlar notas de alunos em matérias de um curso",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "grades-control-api"
+  },
+  "author": "Marcelo Schoeffel",
+  "license": "ISC",
+  "dependencies": {
+    "celebrate": "^12.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
