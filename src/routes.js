@@ -1,7 +1,7 @@
 const express = require("express");
 const { celebrate, Segments, Joi } = require('celebrate');
 
-const gradesControl = require('./controllers/gradesControl');
+const gradesControl = require('./controllers/gradesController');
 
 const routes = express.Router();
 
