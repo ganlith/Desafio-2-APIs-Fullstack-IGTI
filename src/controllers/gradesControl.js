@@ -164,16 +164,18 @@ module.exports = {
 
         const grades = JSON.parse(data);
         
-        const gradesAvg = grades.grades
+        var gradesAvg = grades.grades
             .sort((a, b) => b.value - a.value)
             .filter(grade => (grade.subject === subject && grade.type === type));
 
-        for (let i=0; i<3; i++){
-
-            gradesAvgFinal.push(gradesAvg[i])
+        if (gradesAvg.length > 3){
+            for (let i=0; i<3; i++){
+                gradesAvgFinal.push(gradesAvg[i])
+            }
+            gradesAvg = gradesAvgFinal
         }
-        
-        return response.json({ gradesAvgFinal });
+                
+        return response.json({ gradesAvg });
 
     }
 }
