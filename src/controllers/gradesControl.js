@@ -27,34 +27,36 @@ module.exports = {
         
         let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
 
-        const grades = JSON.parse(data);
+        const gradesAll = JSON.parse(data);
+        
+        let grades = gradesAll.grades;
 
-        let { nextId } = grades;
-
-        grades.grades.push({
-            id: nextId,
+        const newGrades = {
+            id: gradesAll.nextId,
             student: student,
             subject: subject,
             type: type,
             value: value,
             timestamp: new Date()
-        });
+        };
+        console.log(newGrades)
 
-        nextId += 1;
+        const finalGrade = {
+            nextId: gradesAll.nextId + 1,
+            grades: [
+              ...grades,
+              newGrades
+            ]
+        };
+        
+        console.log(finalGrade)
 
-        var index = {
-            nextId: nextId
-        }
-
-        console.log(index);
-  
-
-        fs.writeFile('./src/repositorio/grades.json', JSON.stringify(grades), function (err) {
+        fs.writeFile('./src/repositorio/grades.json', JSON.stringify(finalGrade), function (err) {
             if (err) throw err;
                 console.log('Updated!');
           });
 
-        return response.json({ grades });
+        return response.json({ finalGrade });
 
     },
 
@@ -174,7 +176,7 @@ module.exports = {
             }
             gradesAvg = gradesAvgFinal
         }
-                
+
         return response.json({ gradesAvg });
 
     }
