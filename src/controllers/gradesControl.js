@@ -5,11 +5,8 @@ module.exports = {
     //Lista todas as grades
     async listAllGrades(request, response) {
         var fs = require("fs");
-        var dir = './src/repositorio';
-        var file = 'grades.json'
-
-
-        let data = fs.readFileSync(`${dir}/${file}`, 'utf8');
+        
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
 
         const grades = JSON.parse(data);
 
@@ -24,9 +21,40 @@ module.exports = {
     // foi fornecido para utilização no desafio, o campo nextId já está com um valor definido.Após a inserção é 
     // preciso que esse nextId seja incrementado e salvo no próprio arquivo, de forma que na próxima inserção ele possa ser utilizado.
     async createGrade(request, response) {
+        var fs = require("fs");
+        
         const { student, subject, type, value } = request.body;
+        
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
 
-        return response.json({ student });
+        const grades = JSON.parse(data);
+
+        let { nextId } = grades;
+
+        grades.grades.push({
+            id: nextId,
+            student: student,
+            subject: subject,
+            type: type,
+            value: value,
+            timestamp: new Date()
+        });
+
+        nextId += 1;
+
+        var index = {
+            nextId: nextId
+        }
+
+        console.log(index);
+  
+
+        fs.writeFile('./src/repositorio/grades.json', JSON.stringify(grades), function (err) {
+            if (err) throw err;
+                console.log('Updated!');
+          });
+
+        return response.json({ grades });
 
     },
 
@@ -36,6 +64,11 @@ module.exports = {
     // sua atualização com os novos dados alterados no arquivo grades.json.
     async updateGrade(request, response) {
         const { id, student, subject, type, value } = request.body;
+        var fs = require("fs");
+
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
+
+        const grades = await JSON.parse(data);
 
         return response.json({ student });
 
@@ -58,7 +91,15 @@ module.exports = {
     async listGrade(request, response) {
         const { id } = request.params;
 
-        return response.json({ id });
+        var fs = require("fs");
+
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
+
+        const grades = await JSON.parse(data);
+                     
+        const grade = grades.grades.filter(grade => grade.id === id);
+
+        return response.json({ grade });
 
     },
 
@@ -66,9 +107,22 @@ module.exports = {
     // como parâmetro o student e o subject, e realizar a soma de todas as notas de atividades correspondentes 
     // àquele subject, para aquele student.O endpoint deverá retornar a soma da propriedade value dos registros encontrados.
     async totalGrade(request, response) {
+        var fs = require("fs");
         const { student, subject } = request.body;
 
-        return response.json({ student });
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
+
+        const grades = JSON.parse(data);
+
+        var notaTotal = 0
+
+        grades.grades.forEach(grade => {
+            if ((grade.student === student) && (grade.subject === subject)){
+                notaTotal += grade.value
+            }
+        });
+            
+        return response.json({ notaTotal });
 
     },
 
@@ -77,31 +131,49 @@ module.exports = {
     // value de todos os registros que possuem o subject e type informados, dividindo pelo total de registros 
     // que possuem este mesmo subject e type.
     async avgGrade(request, response) {
+        var fs = require("fs");
         const { subject, type } = request.body;
 
-        return response.json({ subject });
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
 
+        const grades = JSON.parse(data);
+        var total = 0
+        var i = 0
+
+        grades.grades.forEach(grade => {
+            if ((grade.subject === subject) && (grade.type === type)){
+                total += grade.value
+                i ++;
+            }
+        });
+
+        const avgSubject = total / i;
+            
+        return response.json({ avgSubject });
     },
 
     // Crie um endpoint para retornar as três melhores grades de acordo com determinado subject e type.O endpoint 
     // deve receber como parâmetro um subject e um type, e retornar um array com os três registros de maior value 
     // daquele subject e type.A ordem deve ser do maior para o menor.
     async avgTopThreeGrade(request, response) {
+        var fs = require("fs");
+        var gradesAvgFinal = []
         const { subject, type } = request.body;
 
-        return response.json({ subject });
+        let data = fs.readFileSync('./src/repositorio/grades.json', 'utf8');
+
+        const grades = JSON.parse(data);
+        
+        const gradesAvg = grades.grades
+            .sort((a, b) => b.value - a.value)
+            .filter(grade => (grade.subject === subject && grade.type === type));
+
+        for (let i=0; i<3; i++){
+
+            gradesAvgFinal.push(gradesAvg[i])
+        }
+        
+        return response.json({ gradesAvgFinal });
 
     }
 }
-
-// {
-//     "nextId": 49,
-//     "grades": [
-//       {
-//         "id": 1,
-//         "student": "Loiane Groner",
-//         "subject": "01 - JavaScript",
-//         "type": "Fórum",
-//         "value": 15,
-//         "timestamp": "2020-05-19T18:21:24.958Z"
-// }
